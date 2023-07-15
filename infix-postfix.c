@@ -1,24 +1,38 @@
-#include<stdio.h>
+/*
+  conversion of infixexpression to postfix expression
+  */
+  
+#include<stdio.h>   
 #include<ctype.h>
 
-char stack[100];
-int top = -1;
-
-void push(char x)
+char stack[100];    
+int tos = -1;        
+/*
+function is used to push (add) an element x onto the stack.
+*/
+void push(char x)     
 {
-    stack[++top] = x;
+    stack[++tos] = x; 
 }
-
-char pop()
+/*
+ //used to pop (remove) an element from the stack and return the removed character
+*/
+char pop()       
 {
-    if(top == -1)
+    if(tos == -1)   
         return -1;
     else
-        return stack[top--];
+        return stack[tos--]; 
 }
-
-int priority(char x)
+/*
+used to determine the priority of an operator x in the given arithmetic expression
+where 0 indicates the lowest priority, and 2 indicates the highest priority.
+ Parentheses '(' have the lowest priority
+  precedence order $  /*  +- 
+  */
+int priority(char x) 
 {
+  
     if(x == '(')
         return 0;
     if(x == '+' || x == '-')
@@ -33,32 +47,49 @@ int main()
     char exp[100];
     char *e, x;
     printf("Enter the expression : ");
-    scanf("%s",exp);
+    scanf("%s", exp);
     printf("\n");
     e = exp;
+
+    // The code inside the while loop will convert the infix expression to postfix.
     
     while(*e != '\0')
     {
-        if(isalnum(*e))
-            printf("%c ",*e);
-        else if(*e == '(')
-            push(*e);
-        else if(*e == ')')
+        // The following conditions are used to process each character in the expression.
+        
+        if(isalnum(*e))  // If the character is an alphanumeric character (operand).
+            printf("%c ", *e);
+        else if(*e == '(')  // If the character is an opening parenthesis '('.
+            push(*e);  // Push it onto the stack.
+        else if(*e == ')')  // If the character is a closing parenthesis ')'.
         {
+            // Pop and print operators from the stack until an opening parenthesis is encountered.
             while((x = pop()) != '(')
                 printf("%c ", x);
         }
         else
         {
-            while(priority(stack[top]) >= priority(*e))
-                printf("%c ",pop());
+            // The character is an operator, so handle the operator precedence.
+            while(priority(stack[tos]) >= priority(*e))
+                printf("%c ", pop());
             push(*e);
         }
-        e++;
+        e++;  // Move to the next character in the expression.
     }
-    
-    while(top != -1)
+
+    // After processing all characters, pop and print any remaining operators in the stack.
+    while(tos != -1)
     {
-        printf("%c ",pop());
-    }return 0;
+        printf("%c ", pop());
+    }
+
+    return 0;
 }
+
+/*
+Enter the expression : (A+B*C/D)+E*F-(G*H+I-J)
+
+A B C * D / + E F * + G H * I + J - -
+--------------------------------
+Process exited after 85.28 seconds with return value 0
+Press any key to continue . . .*/
